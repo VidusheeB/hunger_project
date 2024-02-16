@@ -1,8 +1,7 @@
 # hunger_trends
 Using pytrends to fetch latest data on hunger keywords. Also includes a scaling function since numbers are always normalized to 100.
 
-Currently the script is all in one monolith.
-it can be run in python as follows:
+Currently the script is all in one monolith. It can be run in python as follows:
 
 ```python
 from main import *
@@ -35,5 +34,6 @@ Here's the folder definition:
 * current: This is what we'll be using. Per topic, there are subfolders per territory. Each territory, we will use the highest date's data to power our regression/dashboard. For example: `trends_data/current/CalFresh/austin_tx/2024-02-16` is the final output data for Feb 16th including all historic data and scaled at a weekly cadence.
 
 ## TODO:
-- [ ] Add monthly extract
-- [ ] Modularize code and add more documentation
+- [ ] Add monthly aggregation. Currently in weekly state. 
+- [ ] Modularize code
+- [ ] Add more documentation
