@@ -337,15 +337,3 @@ def get_latest_data(keyword: str, end_date: datetime):
             .to_csv(f"{current_dir_region}/{latest_date}.csv", index=False, mode='w')
         )
     return "Complete"
-
-
-# start_year = 2018
-# end_year = 2024
-# for keyword in topics:
-#     print("*"*10)
-#     print(keyword)
-#     print("*"*10)
-#     # build_historical_data(keyword, start_year, end_year)
-#     get_latest_data(keyword,datetime.today())
-    
-#     # TODO: get monthly and put into latest
