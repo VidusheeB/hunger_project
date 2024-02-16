@@ -1,0 +1,5 @@
+pytrends 
+random-user-agent
+numpy
+pandas
+Pyarrow 
