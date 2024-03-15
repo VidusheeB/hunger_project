@@ -95,7 +95,7 @@ raw_historic_dir = main_directory / 'raw_historic'
 scaled_historic_dir = main_directory / 'scaled_historic'
 current_dir = main_directory / 'current'
 latest_dir = main_directory / 'latest'
-
+monthly_dir = main_directory / 'monthly'
 
 # if adding new directory above, add it below so it can create accordingly
 # to make above directories if they don't exist
@@ -104,6 +104,7 @@ raw_historic_dir.mkdir(parents=True, exist_ok=True)
 scaled_historic_dir.mkdir(parents=True, exist_ok=True)
 current_dir.mkdir(parents=True, exist_ok=True)
 latest_dir.mkdir(parents=True, exist_ok=True)
+monthly_dir.mkdir(parents=True, exist_ok=True)
 
 all_subdirectories = [raw_historic_dir, scaled_historic_dir, current_dir, latest_dir]
 
@@ -255,6 +256,26 @@ def build_historical_data(keyword: str, start_year: int, end_year: int):
          .to_csv(f"{current_dir_region}/{latest_date}.csv", index=False))
     return region_interest
 
+
+def convert_to_monthly(weekly_df, col):
+    weekly_df['date'] = pd.to_datetime(weekly_df['date'])
+    # Get current minimum and start it from start of year
+    min_date = pd.Timestamp(
+        year = weekly_df['date'].min().year, 
+        month = 1,
+        day = 1
+    )
+    start_of_year = pd.DataFrame([[min_date, np.nan]], columns=['date', col])
+    weekly_df = pd.concat([weekly_df, start_of_year], ignore_index=True)
+    weekly_df = weekly_df.set_index('date')
+    weekly_df = (
+        weekly_df.resample('D').bfill() # make daily and backfill
+        .bfill() #twice so that it fills the first NaN we created with start_of_year
+    )
+    monthly_df = weekly_df.resample('MS').median()
+    return monthly_df
+
+
 def get_latest_data(keyword: str, end_date: datetime):
     # Return: for each region, a pandas dataframe with each year as a column
     region_interest = dict()
@@ -273,7 +294,7 @@ def get_latest_data(keyword: str, end_date: datetime):
         interest_by_region = pd.DataFrame()
         
         # Create a 4 year timeframe
-        start_date = datetime(end_date.year - 4, update_date.month, update_date.day)
+        start_date = datetime(end_date.year - 4, end_date.month, end_date.day)
         current_timeframe = convert_dates_to_timeframe(start=start_date, stop=end_date)
 
          # Build the payload - this applies to all requests being sent!
@@ -336,4 +357,39 @@ def get_latest_data(keyword: str, end_date: datetime):
             scaled_latest_df[['date', latest_date]]
             .to_csv(f"{current_dir_region}/{latest_date}.csv", index=False, mode='w')
         )
+
+        # monthly_df.to_csv(f"{monthly_dir}/{snake_case(region_name)}.csv", index=False, mode='w')
+
     return "Complete"
+
+
+def create_monthly_data():
+    global current_dir
+    keywords = [file for file in current_dir.glob('*') if file and not file.name.startswith('.')]
+    county_df = {}
+    for keyword in keywords:
+        keyword_path = current_dir/keyword
+        counties = [file for file in keyword_path.glob('*') if file and not file.name.startswith('.')]
+        log = False
+        for county in counties:
+            if str(county) == '/Users/rohitjacob/github/hunger_trends/trends_data/current/Electronic Benefit Transfer/dallas_ft__worth_tx':
+                log = True
+            max_filepath = max([file for file in county.glob('*') if file and not file.name.startswith('.')])
+            col = max_filepath.name.strip('.csv')
+            df = pd.read_csv(max_filepath)
+            monthly_df = convert_to_monthly(df, col)
+            monthly_df = monthly_df.rename(columns={col: keyword.stem})
+            if log:
+                print(df)
+                print(monthly_df)
+            if county.stem not in county_df:
+                county_df[county.stem] = monthly_df.copy()
+            else:
+                county_df[county.stem] = pd.merge(
+                    county_df[county.stem], monthly_df, 
+                    left_index=True, right_index=True, how='outer', 
+                )
+
+    # now save each county's data
+    for county, df in county_df.items():
+        df.to_csv(f'{monthly_dir}/{county}.csv')
