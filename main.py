@@ -392,4 +392,4 @@ def create_monthly_data():
 
     # now save each county's data
     for county, df in county_df.items():
-        df.to_csv(f'{monthly_dir}/{county}.csv')
+        df.round(2).to_csv(f'{monthly_dir}/{county}.csv')
