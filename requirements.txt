@@ -1,5 +1,6 @@
-pytrends 
+requests==2.29 #needed for pytrends to work
+pytrends==4.9.2
 random-user-agent
 numpy
 pandas
-Pyarrow 
+Pyarrow

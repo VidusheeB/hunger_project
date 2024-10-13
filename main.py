@@ -1,6 +1,8 @@
 import os 
+import sys
 import re
 import json
+import argparse
 import numpy as np
 import pandas as pd
 from pytrends.request import TrendReq
@@ -18,10 +20,7 @@ def get_user_agent():
 	software_names = [SoftwareName.CHROME.value]
 	operating_systems = [OperatingSystem.WINDOWS.value, OperatingSystem.LINUX.value]   
 	user_agent_rotator = UserAgent(software_names=software_names, operating_systems=operating_systems, limit=100)
-	
-	# Get list of user agents.
-	user_agents = user_agent_rotator.get_user_agents()
-	
+
 	# Get Random User Agent String.
 	return user_agent_rotator.get_random_user_agent()
 
@@ -43,8 +42,10 @@ def refresh_pytrends():
 # Utility Functions
 
 def snake_case(string):
-    string = re.sub(r'(?<=[a-z])(?=[A-Z])|[^a-zA-Z]', ' ', string).strip().replace(' ', '_').strip("_")
-    return ''.join(string.lower())
+    # # Creating problems downstream, remove late
+    return string
+    # string = re.sub(r'(?<=[a-z])(?=[A-Z])|[^a-zA-Z]', ' ', string).strip().replace(' ', '_').strip("_")
+    # return ''.join(string.lower())
 
 def most_current_file(current_dir_region):
     max_date = None
@@ -123,6 +124,41 @@ topics = {
 for subdirectories in all_subdirectories:
 	for topic_name in topics:
 		(subdirectories / topic_name).mkdir(parents=True, exist_ok=True)
+
+
+# This is the output of the above cell
+region_dict = {
+    'Abilene-Sweetwater TX': 'US-TX-662',
+    'Amarillo TX': 'US-TX-634',
+    'Austin TX': 'US-TX-635',
+    'Bakersfield CA': 'US-CA-800',
+    'Beaumont-Port Arthur TX': 'US-TX-692',
+    'Chico-Redding CA': 'US-CA-868',
+    'Corpus Christi TX': 'US-TX-600',
+    'Dallas-Ft. Worth TX': 'US-TX-623',
+    'El Paso TX': 'US-TX-765',
+    'Eureka CA': 'US-CA-802',
+    'Fresno-Visalia CA': 'US-CA-866',
+    'Harlingen-Weslaco-Brownsville-McAllen TX': 'US-TX-636',
+    'Houston TX': 'US-TX-618',
+    'Laredo TX': 'US-TX-749',
+    'Los Angeles CA': 'US-CA-803',
+    'Lubbock TX': 'US-TX-651',
+    'Monterey-Salinas CA': 'US-CA-828',
+    'Odessa-Midland TX': 'US-TX-633',
+    'Palm Springs CA': 'US-CA-804',
+    'Sacramento-Stockton-Modesto CA': 'US-CA-862',
+    'San Angelo TX': 'US-TX-661',
+    'San Antonio TX': 'US-TX-641',
+    'San Diego CA': 'US-CA-825',
+    'San Francisco-Oakland-San Jose CA': 'US-CA-807',
+    'Santa Barbara-Santa Maria-San Luis Obispo CA': 'US-CA-855',
+    'Tyler-Longview(Lufkin & Nacogdoches) TX': 'US-TX-709',
+    'Victoria TX': 'US-TX-626',
+    'Waco-Temple-Bryan TX': 'US-TX-625',
+    'Yuma AZ-El Centro CA': 'US-CA-771'
+}
+
 
 ##########
 # main.py
@@ -210,11 +246,15 @@ def build_historical_data(keyword: str, start_year: int, end_year: int):
             current_interest_over_time = pytrends.interest_over_time().reset_index()
             # Remove partial data
             try:
-                current_interest_over_time = (
-                    current_interest_over_time[~current_interest_over_time.isPartial]
-                    .drop(columns=['isPartial'])
-                    .rename(columns={topics[keyword]: end_date.date()})
-                )
+                if not current_interest_over_time.empty:
+                    current_interest_over_time = (
+                        current_interest_over_time[~current_interest_over_time.isPartial]
+                        .drop(columns=['isPartial'])
+                        .rename(columns={topics[keyword]: end_date.date()})
+                    )
+                else:
+                    print(f"No Data for {region_name} in {current_timeframe}")
+                    continue
             except Exception as e:
                 print(current_interest_over_time)
                 raise e
@@ -239,6 +279,9 @@ def build_historical_data(keyword: str, start_year: int, end_year: int):
     # Now we've got the historic data, lets scale it
     for region_name, region_df in region_interest.items():
         print(f"Scaling {region_name}")
+        if 'date' not in region_df.columns:
+            print(f'No date column in df for {region_name}, {region_df.columns}')
+            continue
         df_columns = region_df.set_index('date').columns.tolist()
         df_columns.sort()
         
@@ -368,12 +411,10 @@ def create_monthly_data():
     keywords = [file for file in current_dir.glob('*') if file and not file.name.startswith('.')]
     county_df = {}
     for keyword in keywords:
+        print(f"Running {keyword}")
         keyword_path = current_dir/keyword
         counties = [file for file in keyword_path.glob('*') if file and not file.name.startswith('.')]
-        log = False
         for county in counties:
-            if str(county) == '/Users/rohitjacob/github/hunger_trends/trends_data/current/Electronic Benefit Transfer/dallas_ft__worth_tx':
-                log = True
             max_filepath = max([file for file in county.glob('*') if file and not file.name.startswith('.')])
             col = max_filepath.name.strip('.csv')
             df = pd.read_csv(max_filepath)
@@ -392,4 +433,45 @@ def create_monthly_data():
 
     # now save each county's data
     for county, df in county_df.items():
+        df['month'] = df.index.month
+        df['year'] = df.index.year
+        df['county'] = county
         df.round(2).to_csv(f'{monthly_dir}/{county}.csv')
+
+
+if __name__ == "__main__":
+    
+    current_year = datetime.now().year
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--historical", action='store_true', help="Flag for historical data")
+    parser.add_argument("--start_year", type=int, help="Start year for historical data")
+    parser.add_argument("--end_year", type=int, default=current_year - 1 , help="End year for historical data")
+    
+    # Adding an optional string argument "keyword"
+    parser.add_argument("--keyword", type=str, help="Keyword for filtering data (optional)")
+
+    args = parser.parse_args()
+
+    if args.historical:
+        if args.start_year and args.end_year:
+
+            if args.keyword:
+                print(f"Building Historical dataset for {args.keyword}")
+                build_historical_data(keyword= args.keyword, start_year=args.start_year, end_year=args.end_year)
+
+            else:
+
+                print("All topics")
+                if input("Buidlding for all topics since keyword not specified. Continue? Y/N: ").strip().upper() == 'Y':
+                    for topic in topics.keys():
+                        print(f"Building Historical dataset for {topic}")
+                        build_historical_data(keyword= topic, start_year=args.start_year, end_year=args.end_year)
+                else:
+                    print("Operation canceled by the user.")
+                    sys.exit() 
+
+        else:
+            print("Please specify both start_year and end_year for historical data.")
+    else:
+        print("Creating monthly")
+        create_monthly_data()
