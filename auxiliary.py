@@ -19,10 +19,10 @@ def get_user_agent():
 def refresh_pytrends():
 	# Recreate a pytrends object with the new user agent 
 	requests_args = {
-		# 'headers': {
-		# 	#'User-Agent': get_user_agent()
-		# },
-		# 'verify':False
+		'headers': {
+			#'User-Agent': get_user_agent()
+		},
+		'verify':False
 	}
 	# pytrends = TrendReq(
 	# 	hl='en-US', 
