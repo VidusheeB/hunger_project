@@ -241,6 +241,7 @@ def build_historical_data(keyword: str, start_year: int, end_year: int):
                 geo=region_code, #this changes to each region, etc.
                 timeframe=current_timeframe
             )
+	    time.sleep(2)  # <-- This slows down requests to avoid rate limits
 
             # Send Requests
             current_interest_over_time = pytrends.interest_over_time().reset_index()
@@ -348,6 +349,8 @@ def get_latest_data(keyword: str, end_date: datetime):
             geo=region_code, #this changes to each region, etc.
             timeframe = current_timeframe
         )
+	time.sleep(2)  #slow down requests to avoid rate limit
+
 
         # Send Requests
         current_interest_over_time = pytrends.interest_over_time().reset_index()
