@@ -1,44 +1,70 @@
-# hunger_trends
-Using pytrends to fetch latest data on hunger keywords. Also includes a scaling function since numbers are always normalized to 100.
+# Getting Started with Create React App
 
-## Running the script
+This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-To install dependencies run `pip install -r requirements.txt`
+## Available Scripts
 
-Currently the script is all in one monolith. It can be run in python as follows:
+In the project directory, you can run:
 
-```python
-from main import *
+### `npm start`
 
-start_year = 2018
-end_year = 2024 #ends 2023
-for keyword in topics:
-    print("*"*10)
-    print(keyword)
-    print("*"*10)
-    # Run build historic only once
-    build_historical_data(keyword, start_year, end_year)
-    # get latest, gets today's data and scales it to historic
-    get_latest_data(keyword,datetime.today())
-    
-    # TODO: get monthly and put into latest
-```
+Runs the app in the development mode.\
+Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
 
-The script on import will create folders by default in `~/Desktop/trends_data` and that can be changed in the script.
+The page will reload when you make changes.\
+You may also see any lint errors in the console.
 
+### `npm test`
 
-## Data
+Launches the test runner in the interactive watch mode.\
+See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
-I've attached the data here in this repo under `trends_data/`
-Each folder will have a subfolder for each topic.
-Here's the folder definition:
+### `npm run build`
 
-* `raw_historic`: This includes the raw extract for the first time this code runs. Currently it includes data from 2018 to 2023.
-* `scaled_historic`: This takes the raw_historic data and scales it across different years.
-* `latest`: This is the latest data we get from a single run. A single run will include 4 years worth of data in a single pull.
-* `current`: This is what we'll be using. Per topic, there are subfolders per territory. Each territory, we will use the highest date's data to power our regression/dashboard. For example: `trends_data/current/CalFresh/austin_tx/2024-02-16` is the final output data for Feb 16th including all historic data and scaled at a weekly cadence.
+Builds the app for production to the `build` folder.\
+It correctly bundles React in production mode and optimizes the build for the best performance.
 
-## TODO:
-- [ ] Add monthly aggregation. Currently in weekly state. 
-- [ ] Modularize code
-- [ ] Add more documentation
+The build is minified and the filenames include the hashes.\
+Your app is ready to be deployed!
+
+See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+
+### `npm run eject`
+
+**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+
+If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+
+Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+
+You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+
+## Learn More
+
+You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+
+To learn React, check out the [React documentation](https://reactjs.org/).
+
+### Code Splitting
+
+This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+
+### Analyzing the Bundle Size
+
+This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+
+### Making a Progressive Web App
+
+This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+
+### Advanced Configuration
+
+This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+
+### Deployment
+
+This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+
+### `npm run build` fails to minify
+
+This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
