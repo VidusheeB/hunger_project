@@ -1,0 +1,95 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+#container {
+	box-shadow: 2px 2px 20px;
+	width: 1200px;
+	padding: 20px 20px 20px 20px;
+	margin: 50px 0px 50px 0px;
+	align-self: center;
+	background-color: white;
+}
+
+#title {
+	text-align: center;
+	font-size: 2.5em;
+	font-weight: bold;
+	padding-top: 0.5em;
+}
+
+#description {
+	text-align: center;
+	font-size: 1.5em;
+	padding: 20px 0 0 0;
+}
+
+#source {
+	text-align: right;
+}
+
+.color-01 {
+	fill: #e5f5e0;
+}
+
+.color-02 {
+	fill: #c7e9c0;
+}
+
+.color-03 {
+	fill: #a1d99b;
+}
+
+.color-04 {
+	fill: #74c476;
+}
+
+.color-05 {
+	fill: #41ab5d;
+}
+
+.color-06 {
+	fill: #238b45;
+}
+
+.color-07 {
+	fill: #006d2c;
+}
+
+.color-error {
+	fill: #000000;
+}
+
+.Green {
+	fill: #b1d8b7;
+}
+
+.Red {
+	fill: #ef7c8e;
+}
+
+.Yellow {
+	fill: #feeba0;
+}
+
+.Grey {
+	fill: #ccc;
+}
+
+.YellowTitle {
+	fill: #fad12cd9;
+}
+
+.GreenTitle {
+	fill: #41ab5d;
+}
+
+.GreyTitle {
+	fill: #aeadad;
+}

@@ -1,0 +1,45 @@
+.progressBarRoot {
+	margin: 0;
+	box-sizing: border-box;
+	background-color: #edf6f8;
+
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	width: 450px;
+	margin-top: 1.5em;
+	margin-left: 3em;
+	margin-bottom: 1em;
+	padding: 1em;
+	padding-left: 2em;
+	padding-right: 2em;
+	border-radius: 20px;
+}
+
+.container {
+	width: 100%;
+	margin-top: 20px;
+	/* margin-bottom: 200px; */
+}
+
+.progressBar {
+	width: 100%;
+	height: 20px;
+	border-radius: 10px;
+	background-color: #e6e6e6;
+	margin-bottom: 10px;
+}
+
+.progressBarFill {
+	height: 100%;
+	border-radius: 10px;
+	background-color: #2ecc70b6;
+	transition: width 0.5s ease-out;
+}
+
+.progressLabel {
+	margin-top: 10px;
+	font-size: 20px;
+	font-weight: bold;
+	color: #444;
+}
